@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Next jsAmplify application with basic authentication"
+
+Parameters:
+  GitHubAccessToken:
+    Type: String
+    NoEcho: true
+
+Resources:
+  AmplifyServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: |-
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": { "Service": "amplify.amazonaws.com" },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+  AmplifyApp:
+    Type: AWS::Amplify::App
+    Properties:
+      AutoBranchCreationConfig:
+        AutoBranchCreationPatterns:
+          - "*"
+          - "*/**"
+        BasicAuthConfig:
+          EnableBasicAuth: true
+          Username: "hello"
+          Password: "world"
+        EnableAutoBranchCreation: true
+        EnableAutoBuild: true
+        EnablePerformanceMode: false
+        EnablePullRequestPreview: false
+      EnableBranchAutoDeletion: true
+      IAMServiceRole: !GetAtt AmplifyServiceRole.Arn
+      Name: amplify-cloudfront-basic-auth-bug
+      Repository: "https://github.com/Leejjon/amplify-cloudfront-basic-auth-bug"
+      AccessToken: !Ref GitHubAccessToken
+  AmplifyMainBranch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      AppId: !GetAtt AmplifyApp.AppId
+      BranchName: "main"
+      EnableAutoBuild: true
+      EnablePullRequestPreview: true
+      Stage: "PRODUCTION"
+
+  AmplifyDevelopBranch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      AppId: !GetAtt AmplifyApp.AppId
+      BranchName: "develop"
+      EnableAutoBuild: true
+      EnablePullRequestPreview: true
+      Stage: "PRODUCTION"
