@@ -26,18 +26,6 @@ Resources:
   AmplifyApp:
     Type: AWS::Amplify::App
     Properties:
-      AutoBranchCreationConfig:
-        AutoBranchCreationPatterns:
-          - "*"
-          - "*/**"
-        BasicAuthConfig:
-          EnableBasicAuth: true
-          Username: "hello"
-          Password: "world"
-        EnableAutoBranchCreation: true
-        EnableAutoBuild: true
-        EnablePerformanceMode: false
-        EnablePullRequestPreview: false
       EnableBranchAutoDeletion: true
       IAMServiceRole: !GetAtt AmplifyServiceRole.Arn
       Name: amplify-cloudfront-basic-auth-bug
@@ -49,14 +37,15 @@ Resources:
       AppId: !GetAtt AmplifyApp.AppId
       BranchName: "main"
       EnableAutoBuild: true
-      EnablePullRequestPreview: true
       Stage: "PRODUCTION"
-
   AmplifyDevelopBranch:
     Type: AWS::Amplify::Branch
     Properties:
       AppId: !GetAtt AmplifyApp.AppId
+      BasicAuthConfig:
+        EnableBasicAuth: true
+        Username: "hello"
+        Password: "awssupport"
       BranchName: "develop"
       EnableAutoBuild: true
-      EnablePullRequestPreview: true
       Stage: "PRODUCTION"
